@@ -121,11 +121,9 @@ void PesquisarCartas(CARTA* cartas, int tamanho){
     }
 }
 
-void AlterarCartas(CARTA* cartas, int tamanho){
+void AlterarCartas(CARTA* cartas, int tamanho) {
     int jogadorEncontrado = 0;
     int maisdeumAtleta = 0;
-    int option;
-    int codigoatleta;
 
     char buscaNome[30];
     printf("Alterar dados dos atletas!\n");
@@ -135,25 +133,64 @@ void AlterarCartas(CARTA* cartas, int tamanho){
     // Inicialização de jogadorrepetido
     CARTA* jogadorrepetido = NULL;
 
-    for(int j = 0; j < tamanho; j++){
-        if(strcasecmp(buscaNome, cartas[j].nome) == 0){
+    for (int j = 0; j < tamanho; j++) {
+        if (strcasecmp(buscaNome, cartas[j].nome) == 0) {
             jogadorEncontrado = 1;
             maisdeumAtleta++;
 
             // Realocando memória para armazenar os jogadores repetidos
-            jogadorrepetido = (CARTA*)realloc(jogadorrepetido, maisdeumAtleta * sizeof(CARTA));
-            if(jogadorrepetido == NULL){
-                perror("Erro ao realocar memória!\n");
+            CARTA* temp = realloc(jogadorrepetido, maisdeumAtleta * sizeof(CARTA));
+            if (temp == NULL) {
+                perror("Erro ao realocar memória!");
+                free(jogadorrepetido); // Libera a memória já alocada
                 exit(1);
             }
+            jogadorrepetido = temp;
             jogadorrepetido[maisdeumAtleta - 1] = cartas[j];
         }
     }
 
-    // Libera a memória alocada
-    free(jogadorrepetido);
+    if (jogadorEncontrado) {
+        // Permite ao usuário alterar os dados dos jogadores encontrados
+        for (int i = 0; i < maisdeumAtleta; i++) {
+            printf("Jogador encontrado: %s\n", jogadorrepetido[i].nome);
+            printf("Deseja alterar os dados deste jogador? (1 - Sim, 0 - Não): ");
+            int alterar;
+            scanf("%d", &alterar);
+            getchar(); // Limpa o buffer do stdin
 
-    if(!jogadorEncontrado){
+            if (alterar) {
+                printf("Digite o novo nome: ");
+                LeString(jogadorrepetido[i].nome, 29);
+                printf("Digite a nova letra: ");
+                scanf(" %c", &jogadorrepetido[i].letra);
+                printf("Digite o novo número: ");
+                scanf("%d", &jogadorrepetido[i].numero);
+                printf("Digite o novo drible: ");
+                scanf("%d", &jogadorrepetido[i].dri);
+                printf("Digite a nova defesa: ");
+                scanf("%d", &jogadorrepetido[i].def);
+                printf("Digite o novo físico: ");
+                scanf("%d", &jogadorrepetido[i].fis);
+                printf("Digite o novo passe: ");
+                scanf("%d", &jogadorrepetido[i].pas);
+                printf("Digite o novo código: ");
+                scanf("%d", &jogadorrepetido[i ].codigo);
+            }
+        }
+        
+        // Atualiza os dados no vetor original
+        for (int j = 0; j < tamanho; j++) {
+            for (int k = 0; k < maisdeumAtleta; k++) {
+                if (strcasecmp(cartas[j].nome, jogadorrepetido[k].nome) == 0) {
+                    cartas[j] = jogadorrepetido[k];
+                }
+            }
+        }
+        
+        // Libera a memória alocada
+        free(jogadorrepetido);
+    } else {
         printf("Carta não encontrada!\n");
     }
 }
